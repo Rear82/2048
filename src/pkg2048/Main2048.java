@@ -20,14 +20,14 @@ public class Main2048 {
 	/**
 	 * @param args the command line arguments
 	 */
-	static int caozuoshu;
-	static int tu[][] = new int[4][4];
-	static int tuback[][][] = new int[10000][4][4];
-	static int fang, score;
+	static int stepOfGame;
+	static int gameBoard[][] = new int[4][4];
+	static int gameBoardBack[][][] = new int[10000][4][4];
+	static int Direction, score;
 	static int scoreback[] = new int[10000];
-	static boolean shifou, suv;
+	static boolean Effective_Y_N, survive;
 
-	public static void cundang() throws Exception {
+	public static void saveOnFile() throws Exception {
 		File file = new File("存档.txt");
 		if (!file.exists()) {
 			file.createNewFile();
@@ -38,19 +38,19 @@ public class Main2048 {
 		for (int i = 0; i < 4; i++) {
 			for (int j = 0; j < 4; j++) {
 				br.newLine();
-				br.write(Integer.toString(tu[i][j]));
+				br.write(Integer.toString(gameBoard[i][j]));
 			}
 		}
 		br.close();
 	}
 
-	public static void duqu() throws Exception {
+	public static void readFromFile() throws Exception {
 		File file = new File("存档.txt");
 		if (!file.exists()) {
 			System.out.println("没有发现存档文件！");
-			qingkong();
-			shengcheng();
-			shengcheng();
+			clear();
+			newNumGenerate();
+			newNumGenerate();
 		} else {
 			InputStreamReader isr = new InputStreamReader(new FileInputStream(file), "utf-8");
 			BufferedReader br = new BufferedReader(isr);
@@ -64,29 +64,29 @@ public class Main2048 {
 			score = shuju[0];
 			for (i = 0; i < 4; i++) {
 				for (int j = 0; j < 4; j++) {
-					tu[i][j] = shuju[i * 4 + j + 1];
+					gameBoard[i][j] = shuju[i * 4 + j + 1];
 				}
 			}
 		}
 	}
 
-	public static void jilu() {
+	public static void gameSave() {
 		for (int i = 0; i < 4; i++) {
 			for (int j = 0; j < 4; j++) {
-				tuback[caozuoshu][i][j] = tu[i][j];
+				gameBoardBack[stepOfGame][i][j] = gameBoard[i][j];
 			}
 		}
-		scoreback[caozuoshu] = score;
+		scoreback[stepOfGame] = score;
 	}
 
-	public static void huifu() {
-		caozuoshu--;
+	public static void gameBack() {
+		stepOfGame--;
 		for (int i = 0; i < 4; i++) {
 			for (int j = 0; j < 4; j++) {
-				tu[i][j] = tuback[caozuoshu][i][j];
+				gameBoard[i][j] = gameBoardBack[stepOfGame][i][j];
 			}
 		}
-		score = scoreback[caozuoshu];
+		score = scoreback[stepOfGame];
 	}
 
 	public static void myprint(String c, int a) {
@@ -118,7 +118,7 @@ public class Main2048 {
 		return s;
 	}
 
-	public static String zhuanhuan(int b) {
+	public static String formatSwitch(int b) {
 		String s = "";
 		String y = s;
 		int t = (int) (4 - len(b)) / 2;
@@ -142,7 +142,7 @@ public class Main2048 {
 		String[][] b = new String[4][4];
 		for (int i = 0; i < 4; i++) {
 			for (int j = 0; j < 4; j++) {
-				b[i][j] = zhuanhuan(arr[i][j]);
+				b[i][j] = formatSwitch(arr[i][j]);
 
 				b[i][j] = b[i][j] + "│";
 
@@ -164,22 +164,26 @@ public class Main2048 {
 
 	}
 
-	public static void shengcheng() {
+	public static void newNumGenerate() {
 		int x, y;
 		x = ram(0, 3);
 		y = ram(0, 3);
 
-		while (tu[x][y] != 0) {
+		while (gameBoard[x][y] != 0) {
 			x = ram(0, 3);
 			y = ram(0, 3);
 		}
 
-		int a = ram(1, 2);
-		tu[x][y] = a * 2;
+		int a = ram(1, 4);
+		if (a == 1) {
+			gameBoard[x][y] = 4;
+		} else {
+			gameBoard[x][y] = 2;
+		}
 
 	}
 
-	public static void yidong(int arr[][]) {
+	public static void move(int arr[][]) {
 		int panduan;
 		for (int i = 0; i < 4; i++) {
 			panduan = 0;
@@ -193,12 +197,12 @@ public class Main2048 {
 								arr[i][j] = 0;
 								score = score + arr[i][k] * 2;
 								arr[i][k] = arr[i][k] * 2;
-								shifou = true;
+								Effective_Y_N = true;
 							} else {
 								if ((k - 1) != j) {
 									arr[i][k - 1] = arr[i][j];
 									arr[i][j] = 0;
-									shifou = true;
+									Effective_Y_N = true;
 								}
 							}
 							break;
@@ -207,7 +211,7 @@ public class Main2048 {
 					if (panduan == 0) {
 						arr[i][3] = arr[i][j];
 						arr[i][j] = 0;
-						shifou = true;
+						Effective_Y_N = true;
 					}
 				}
 			}
@@ -215,7 +219,7 @@ public class Main2048 {
 	}
 
 	public static void gameover() {
-		suv = false;
+		survive = false;
 		myprint("*", 20);
 		System.out.println("\n");
 		myprint(" ", 6, "game over!");
@@ -231,13 +235,13 @@ public class Main2048 {
 			case "y":
 			case "Y":
 				System.out.println("已经重新开始游戏！");
-				suv = true;
-				qingkong();
-				shengcheng();
-				shengcheng();
-				jilu();
-				xmlprint(tu);
-				while (suv == true) {
+				survive = true;
+				clear();
+				newNumGenerate();
+				newNumGenerate();
+				gameSave();
+				xmlprint(gameBoard);
+				while (survive == true) {
 					game();
 				}
 				break;
@@ -245,16 +249,16 @@ public class Main2048 {
 	}
 
 	public static void game() {
-		if (suv = true) {
-			shifou = false;
+		if (survive = true) {
+			Effective_Y_N = false;
 			Scanner input = new Scanner(System.in);
 			String m = input.next();
 			String n = m;
 			switch (n) {
 				case "b":
-					if (caozuoshu > 0) {
-						huifu();
-						xmlprint(tu);
+					if (stepOfGame > 0) {
+						gameBack();
+						xmlprint(gameBoard);
 					}
 					break;
 				case "a":
@@ -264,35 +268,35 @@ public class Main2048 {
 
 					switch (m) {
 						case "d":
-							fang = 1;
+							Direction = 1;
 							break;
 						case "s":
-							fang = 2;
+							Direction = 2;
 							break;
 						case "a":
-							fang = 3;
+							Direction = 3;
 							break;
 						case "w":
-							fang = 4;
+							Direction = 4;
 							break;
 					}
 
 					int[][] linshi = new int[4][4];
-					switch (fang) {
+					switch (Direction) {
 						case 1:
-							yidong(tu);
+							move(gameBoard);
 							break;
 
 						case 4:
 							for (int i = 0; i < 4; i++) {
 								for (int j = 0; j < 4; j++) {
-									linshi[i][j] = tu[3 - j][i];
+									linshi[i][j] = gameBoard[3 - j][i];
 								}
 							}
-							yidong(linshi);
+							move(linshi);
 							for (int i = 0; i < 4; i++) {
 								for (int j = 0; j < 4; j++) {
-									tu[i][j] = linshi[j][3 - i];
+									gameBoard[i][j] = linshi[j][3 - i];
 								}
 							}
 							break;
@@ -300,13 +304,13 @@ public class Main2048 {
 						case 3:
 							for (int i = 0; i < 4; i++) {
 								for (int j = 0; j < 4; j++) {
-									linshi[i][j] = tu[i][3 - j];
+									linshi[i][j] = gameBoard[i][3 - j];
 								}
 							}
-							yidong(linshi);
+							move(linshi);
 							for (int i = 0; i < 4; i++) {
 								for (int j = 0; j < 4; j++) {
-									tu[i][j] = linshi[i][3 - j];
+									gameBoard[i][j] = linshi[i][3 - j];
 								}
 							}
 							break;
@@ -314,25 +318,25 @@ public class Main2048 {
 						case 2:
 							for (int i = 0; i < 4; i++) {
 								for (int j = 0; j < 4; j++) {
-									linshi[i][j] = tu[j][3 - i];
+									linshi[i][j] = gameBoard[j][3 - i];
 								}
 							}
-							yidong(linshi);
+							move(linshi);
 							for (int i = 0; i < 4; i++) {
 								for (int j = 0; j < 4; j++) {
-									tu[i][j] = linshi[3 - j][i];
+									gameBoard[i][j] = linshi[3 - j][i];
 								}
 							}
 							break;
 					}
-					if (shifou == true) {
-						caozuoshu++;
-						jilu();
+					if (Effective_Y_N == true) {
+						stepOfGame++;
+						gameSave();
 
 						Timer timer = new Timer();
 
 						System.out.println("移动完成：\n");
-						xmlprint(tu);
+						xmlprint(gameBoard);
 						System.out.println("正在随机生成新的数字：\n\n");
 						timer.schedule(new mytask(), 250);
 
@@ -341,7 +345,7 @@ public class Main2048 {
 						int kl = 0;
 						for (int i = 0; i < 4; i++) {
 							for (int j = 0; j < 4; j++) {
-								if (tu[i][j] == 0) {
+								if (gameBoard[i][j] == 0) {
 									kl = 1;
 								}
 							}
@@ -360,26 +364,26 @@ public class Main2048 {
 
 		public void run() {
 
-			shengcheng();
-			xmlprint(tu);
+			newNumGenerate();
+			xmlprint(gameBoard);
 			System.out.println("已经随机生成新的数字：\n您现在的分数为" + score + "分\n");
 			try {
-				cundang();
+				saveOnFile();
 			} catch (Exception ex) {
 				Logger.getLogger(Main2048.class.getName()).log(Level.SEVERE, null, ex);
 			}
 		}
 	}
 
-	public static void qingkong() {
-		shifou = false;
-		caozuoshu = 0;
+	public static void clear() {
+		Effective_Y_N = false;
+		stepOfGame = 0;
 		score = 0;
-		suv = true;
+		survive = true;
 		score = 0;
 		for (int i = 0; i < 4; i++) {
 			for (int j = 0; j < 4; j++) {
-				tu[i][j] = 0;
+				gameBoard[i][j] = 0;
 			}
 		}
 	}
@@ -392,9 +396,9 @@ public class Main2048 {
 		int u = 0;
 		switch (m) {
 			case "1": {
-				suv = true;
+				survive = true;
 				try {
-					duqu();
+					readFromFile();
 				} catch (Exception ex) {
 					Logger.getLogger(Main2048.class.getName()).log(Level.SEVERE, null, ex);
 				}
@@ -404,14 +408,14 @@ public class Main2048 {
 			break;
 		}
 		if (u == 0) {
-			qingkong();
-			shengcheng();
-			shengcheng();
+			clear();
+			newNumGenerate();
+			newNumGenerate();
 		}
-		jilu();
+		gameSave();
 
-		xmlprint(tu);
-		while (suv == true) {
+		xmlprint(gameBoard);
+		while (survive == true) {
 			game();
 
 		}
