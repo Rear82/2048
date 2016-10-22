@@ -183,7 +183,7 @@ public class Main2048 {
 
 	}
 
-	public static void move(int arr[][]) {
+	public static void Move(int arr[][]) {
 		int panduan;
 		for (int i = 0; i < 4; i++) {
 			panduan = 0;
@@ -284,7 +284,7 @@ public class Main2048 {
 					int[][] linshi = new int[4][4];
 					switch (Direction) {
 						case 1:
-							move(gameBoard);
+							Move(gameBoard);
 							break;
 
 						case 4:
@@ -293,7 +293,7 @@ public class Main2048 {
 									linshi[i][j] = gameBoard[3 - j][i];
 								}
 							}
-							move(linshi);
+							Move(linshi);
 							for (int i = 0; i < 4; i++) {
 								for (int j = 0; j < 4; j++) {
 									gameBoard[i][j] = linshi[j][3 - i];
@@ -307,7 +307,7 @@ public class Main2048 {
 									linshi[i][j] = gameBoard[i][3 - j];
 								}
 							}
-							move(linshi);
+							Move(linshi);
 							for (int i = 0; i < 4; i++) {
 								for (int j = 0; j < 4; j++) {
 									gameBoard[i][j] = linshi[i][3 - j];
@@ -321,7 +321,7 @@ public class Main2048 {
 									linshi[i][j] = gameBoard[j][3 - i];
 								}
 							}
-							move(linshi);
+							Move(linshi);
 							for (int i = 0; i < 4; i++) {
 								for (int j = 0; j < 4; j++) {
 									gameBoard[i][j] = linshi[3 - j][i];
