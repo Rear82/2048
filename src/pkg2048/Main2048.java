@@ -252,7 +252,11 @@ public class Main2048 {
 		if (survive = true) {
 			Effective_Y_N = false;
 			Scanner input = new Scanner(System.in);
-			String m = input.next();
+			String m;
+			do {
+				System.out.println("请输入要进行的操作(wsad或b推格):");
+				m = input.next();
+			} while (!"w".equals(m) && !"s".equals(m) && !"a".equals(m) && !"d".equals(m) && !"b".equals(m));
 			String n = m;
 			switch (n) {
 				case "b":
@@ -367,6 +371,7 @@ public class Main2048 {
 			newNumGenerate();
 			xmlprint(gameBoard);
 			System.out.println("已经随机生成新的数字：\n您现在的分数为" + score + "分\n");
+			System.out.println("请输入要进行的操作(wsad或b推格):");
 			try {
 				saveOnFile();
 			} catch (Exception ex) {
@@ -390,9 +395,13 @@ public class Main2048 {
 
 	public static void main(String[] args) {
 		// TODO code application logic here
-		System.out.println("欢迎来到2048小游戏！\n开发者:Rear82\n操作说明:使用w键向上，s键向下，d键向右，a键向左。\n您也可以输入b键来撤销上一步操作。\n输入1来载入上一次游戏，输入2来开始新游戏！");
+		System.out.println("欢迎来到2048小游戏！\n开发者:Rear82\n操作说明:使用w键向上，s键向下，d键向右，a键向左。\n您也可以输入b键来撤销上一步操作。");
 		Scanner input = new Scanner(System.in);
-		String m = input.next();
+		String m;
+		do {
+			System.out.println("\n输入1来载入上一次游戏，输入2来开始新游戏！");
+			m = input.next();
+		} while (!"1".equals(m) && !"2".equals(m));
 		int u = 0;
 		switch (m) {
 			case "1": {
