@@ -10,6 +10,7 @@ package pkg2048;
  * @author Rear82
  */
 import java.io.*;
+import static java.lang.Thread.sleep;
 import java.util.*;
 import java.util.Timer;
 import java.util.logging.Level;
@@ -185,12 +186,14 @@ public class Main2048 {
 
 	public static void Move(int arr[][]) {
 		int judge;
+
 		for (int i = 0; i < 4; i++) {
-			judge = 0;
+
+			int bound = 3;
 			for (int j = 2; j > -1; j--) {
 				if (arr[i][j] != 0) {
-
-					for (int k = 1 + j; k <= 3; k++) {
+					judge = 0;
+					for (int k = 1 + j; k <= bound; k++) {
 						if (arr[i][k] != 0) {
 							judge = 1;
 							if (arr[i][j] == arr[i][k]) {
@@ -198,18 +201,21 @@ public class Main2048 {
 								score = score + arr[i][k] * 2;
 								arr[i][k] = arr[i][k] * 2;
 								Effective_Y_N = true;
+								bound = k - 1;
 							} else {
 								if ((k - 1) != j) {
 									arr[i][k - 1] = arr[i][j];
 									arr[i][j] = 0;
 									Effective_Y_N = true;
+									bound = k - 1;
 								}
 							}
+
 							break;
 						}
 					}
 					if (judge == 0) {
-						arr[i][3] = arr[i][j];
+						arr[i][bound] = arr[i][j];
 						arr[i][j] = 0;
 						Effective_Y_N = true;
 					}
@@ -254,7 +260,7 @@ public class Main2048 {
 			Scanner input = new Scanner(System.in);
 			String m;
 			do {
-				System.out.println("请输入要进行的操作(wsad或b推格):");
+				System.out.println("请输入要进行的操作(wsad或b退格):");
 				m = input.next();
 			} while (!"w".equals(m) && !"s".equals(m) && !"a".equals(m) && !"d".equals(m) && !"b".equals(m));
 			String n = m;
@@ -341,8 +347,22 @@ public class Main2048 {
 
 						System.out.println("移动完成：\n");
 						xmlprint(gameBoard);
-						System.out.println("正在随机生成新的数字：\n\n");
-						timer.schedule(new mytask(), 250);
+						System.out.println("正在随机生成新的数字：\n\n\n");
+
+						try {
+							sleep(300);
+						} catch (InterruptedException ex) {
+							Logger.getLogger(Main2048.class.getName()).log(Level.SEVERE, null, ex);
+						}
+						newNumGenerate();
+
+						xmlprint(gameBoard);
+						System.out.println("已经随机生成新的数字：\n您现在的分数为" + score + "分\n");
+						try {
+							saveOnFile();
+						} catch (Exception ex) {
+							Logger.getLogger(Main2048.class.getName()).log(Level.SEVERE, null, ex);
+						}
 
 					} else {
 						System.out.println("这是一次无效的移动！");
@@ -360,22 +380,6 @@ public class Main2048 {
 						}
 					}
 					break;
-			}
-		}
-	}
-
-	static class mytask extends TimerTask {
-
-		public void run() {
-
-			newNumGenerate();
-			xmlprint(gameBoard);
-			System.out.println("已经随机生成新的数字：\n您现在的分数为" + score + "分\n");
-			System.out.println("请输入要进行的操作(wsad或b推格):");
-			try {
-				saveOnFile();
-			} catch (Exception ex) {
-				Logger.getLogger(Main2048.class.getName()).log(Level.SEVERE, null, ex);
 			}
 		}
 	}
