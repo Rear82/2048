@@ -184,15 +184,15 @@ public class Main2048 {
 	}
 
 	public static void Move(int arr[][]) {
-		int panduan;
+		int judge;
 		for (int i = 0; i < 4; i++) {
-			panduan = 0;
+			judge = 0;
 			for (int j = 2; j > -1; j--) {
 				if (arr[i][j] != 0) {
 
 					for (int k = 1 + j; k <= 3; k++) {
 						if (arr[i][k] != 0) {
-							panduan = 1;
+							judge = 1;
 							if (arr[i][j] == arr[i][k]) {
 								arr[i][j] = 0;
 								score = score + arr[i][k] * 2;
@@ -208,7 +208,7 @@ public class Main2048 {
 							break;
 						}
 					}
-					if (panduan == 0) {
+					if (judge == 0) {
 						arr[i][3] = arr[i][j];
 						arr[i][j] = 0;
 						Effective_Y_N = true;
